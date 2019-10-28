@@ -10,11 +10,30 @@ server.use(cors())
 server.use(express.json())
 
 
+server.put('/api/users/:id', updateUser)
 server.get('/api/users/:id', findUser)
 server.delete('/api/users/:id', deleteUser)
 server.post('/api/users', addUser)
 server.get('/api/users', getAllUsers)
 server.get('*', handleDefaultrequest)
+
+
+function updateUser(req, res) {
+    const {id} = req.params;
+
+    const userUpdate = {
+        name: req.body.name,
+        bio: req.body.bio
+    }
+
+    db.update(id, userUpdate)
+        .then(data => {
+            console.log(data)
+        })
+        .catch(error => {
+            console.log(error)
+        })
+}
 
 function findUser(req, res) {
     const {id} = req.params;
