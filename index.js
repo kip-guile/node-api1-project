@@ -10,10 +10,24 @@ server.use(cors())
 server.use(express.json())
 
 
+server.get('/api/users/:id', findUser)
 server.delete('/api/users/:id', deleteUser)
 server.post('/api/users', addUser)
 server.get('/api/users', getAllUsers)
 server.get('*', handleDefaultrequest)
+
+function findUser(req, res) {
+    const {id} = req.params;
+
+    db.findById(id)
+    .then(data => {
+        console.log(data);
+        res.status(200).json(data)       
+    })
+    .catch(error => {
+        console.log(error)
+    })
+}
 
 function deleteUser(req, res) {
     const {id} = req.params;
