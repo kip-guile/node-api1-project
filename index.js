@@ -26,13 +26,27 @@ function updateUser(req, res) {
         bio: req.body.bio
     }
 
-    db.update(id, userUpdate)
+    if (!userUpdate) {
+        res
+            .status(400)
+            .json({errorMessage: "Please provide name and bio for the user."})
+    } else {
+        db.update(id, userUpdate)
         .then(data => {
-            console.log(data)
+            if (data) {
+                res.status(200).json(data)
+            } else {
+                res.status(404).json({
+                    errorMessage: "The user with the specified ID does not exist."
+                })
+            }
         })
-        .catch(error => {
-            console.log(error)
+        .catch(() => {
+            res.status(500).json({
+                errorMessage: "The user information could not be modified."
+            })
         })
+    }
 }
 
 function findUser(req, res) {
@@ -40,8 +54,11 @@ function findUser(req, res) {
 
     db.findById(id)
     .then(data => {
-        console.log(data);
-        res.status(200).json(data)       
+        if (data) {
+            res.status(200).json(data) 
+        } else {
+            res.status(404).json({errorMessage: "The user with the specified ID does not exist."})
+        }
     })
     .catch(error => {
         console.log(error)
@@ -53,10 +70,12 @@ function deleteUser(req, res) {
 
     db.remove(id)
     .then(data => {
-        console.log(data)
+        if (!data) {
+            res.status(404).json({errorMessage: "The user with the specified ID does not exist."})
+        }
     })
-    .catch(error => {
-        console.log(error)
+    .catch(() => {
+        res.status(500).json({errorMessage: "The user could not be removed"})
     })
 }
 
@@ -66,14 +85,19 @@ function addUser(req, res) {
         bio: req.body.bio
     }
 
-    db.insert(user)
-    .then(data => {
-        console.log(data)
-        res.status(201).json(data)
-    })
-    .catch(error => {
-        console.log(error)
-    })
+    if (!user) {
+        res
+            .status(400)
+            .json({errorMessage: 'Pleas provide name and bio for the user'})
+    } else {
+        db.insert(user)
+        .then(data => {
+            res.status(201).json(user);
+        })
+        .catch(() => {
+            res.status(500).json({errorMessage: "There was an error while saving the user to the database"})
+        })
+    }
 }
 
 function getAllUsers(req, res) {
@@ -82,8 +106,8 @@ function getAllUsers(req, res) {
         console.log(data);
         res.status(200).json(data)
     })
-    .catch(error => {
-        console.log(error)
+    .catch(() => {
+        res.status(500).json({errorMessage: "The users information could not be retrieved."})
     })
 }
 
